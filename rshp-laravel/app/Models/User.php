@@ -1,5 +1,4 @@
 <?php
-// File: app/Models/User.php
 
 namespace App\Models;
 
@@ -12,10 +11,10 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    // --- TAMBAHAN DARI MODUL ---
-    protected $table = 'user';
-    protected $primaryKey = 'iduser';
-    // -------------------------
+    // --- KONFIGURASI TABEL KHUSUS ---
+    protected $table = 'user';      // Nama tabel di database (bukan 'users')
+    protected $primaryKey = 'iduser'; // Primary key custom (bukan 'id')
+    // --------------------------------
 
     /**
      * The attributes that are mass assignable.
@@ -57,7 +56,6 @@ class User extends Authenticatable
 
     /**
      * Relasi: "User ini 'punya satu' Pemilik"
-     * (Dari Modul 9)
      */
     public function pemilik()
     {
@@ -66,7 +64,6 @@ class User extends Authenticatable
 
     /**
      * Relasi: "User ini punya banyak data RoleUser"
-     * (Dari Modul 10 - Untuk Login)
      */
     public function roleUser()
     {
@@ -74,12 +71,29 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi: "User ini 'punya banyak' Role" (via tabel pivot)
-     * (INI YANG KITA TAMBAHKAN KEMBALI - Untuk Halaman Admin)
+     * Relasi: "User ini 'punya banyak' Role" (via tabel pivot role_user)
      */
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'role_user', 'iduser', 'idrole')
                     ->wherePivot('status', 1);
+    }
+
+    /**
+     * Relasi: User ini adalah seorang Dokter (One to One)
+     * FK: id_user (di tabel dokters), LK: iduser (di tabel user)
+     */
+    public function dokterData()
+    {
+        return $this->hasOne(Dokter::class, 'id_user', 'iduser');
+    }
+
+    /**
+     * Relasi: User ini adalah seorang Perawat (One to One)
+     * FK: id_user (di tabel perawats), LK: iduser (di tabel user)
+     */
+    public function perawatData()
+    {
+        return $this->hasOne(Perawat::class, 'id_user', 'iduser');
     }
 }
